@@ -34,6 +34,8 @@ type rect struct {
 func main() {
 	// first load the input shapes into memory
 	var shapes []rect
+	var island map[uint]bool
+	island = make(map[uint]bool)
 
 	file, err := os.Open("input.txt")
 	if err != nil{
@@ -61,6 +63,8 @@ func main() {
 			}
 			// add to shapes list
 			shapes = append(shapes, rect{nums[0], nums[0] + nums[2] - 1, nums[1], nums[1] + nums[3] - 1})
+			// add to island map
+			island[uint(len(shapes))] = true
 		} else {
 			log.Print("Error parsing line: %v", scanner.Text())
 		}
@@ -69,7 +73,7 @@ func main() {
 	// we now have an array of shapes, start adding to cover and overlap arrays
 	// start with a default size of 1000x1000 and throw error if that's too small
 	const size = 1100
-	var arrCover [size][size]uint8
+	var arrCover [size][size][]uint
 
 	for i, shape := range shapes {
 		if shape.x2 > size || shape.y2 > size {
@@ -79,7 +83,7 @@ func main() {
 		// fmt.Printf("Shape %v (%v,%v)(%v,%v)\n", i, shape.x1, shape.y1, shape.x2, shape.y2)
 		for x := shape.x1; x <= shape.x2; x++ {
 			for y := shape.y1; y <= shape.y2; y++ {
-				arrCover[y][x] += 1
+				arrCover[y][x] = append(arrCover[y][x], uint(i+1))
 			}
 		}
 	}
@@ -88,7 +92,7 @@ func main() {
 	// fmt.Println(arrOver)
 
 	// now count how much area is in the overlap array
-	count := 0
+	// count := 0
 	// for _,a := range arrCover {
 	// 	str := ""
 	// 	for _,v := range a {
@@ -97,13 +101,27 @@ func main() {
 	// 	fmt.Println(str)
 	// }
 
+	// Find the amount of overlap
+	// for _,a := range arrCover {
+	// 	for _,v := range a {
+	// 		if v == ^uint(0) {
+	// 			count++
+	// 		}
+	// 	}
+	// }
+	// fmt.Printf("Count: %v",count)
+	
+	// find a space with only on entry
 	for _,a := range arrCover {
 		for _,v := range a {
-			if v > 1{
-				count++
+			if len(v) > 1 {
+				// delete all from map
+				for _,s := range v {
+					delete(island, s)
+				}
 			}
 		}
 	}
+	fmt.Println(island)
 
-	fmt.Printf("Count: %v",count)
 }
