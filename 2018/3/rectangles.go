@@ -68,9 +68,8 @@ func main() {
 
 	// we now have an array of shapes, start adding to cover and overlap arrays
 	// start with a default size of 1000x1000 and throw error if that's too small
-	const size = 32
+	const size = 1100
 	var arrCover [size][size]uint8
-	var arrOver [size][size]uint8
 
 	for i, shape := range shapes {
 		if shape.x2 > size || shape.y2 > size {
@@ -80,14 +79,7 @@ func main() {
 		// fmt.Printf("Shape %v (%v,%v)(%v,%v)\n", i, shape.x1, shape.y1, shape.x2, shape.y2)
 		for x := shape.x1; x <= shape.x2; x++ {
 			for y := shape.y1; y <= shape.y2; y++ {
-				if arrCover[y][x] != 0 {
-					// fill overlap array
-					arrCover[y][x] = uint8(i+1)
-					arrOver[y][x] = 1
-				} else {
-					// fmt.Printf("Setting pixel (%v,%v)\n", x, y)
-					arrCover[y][x] = uint8(i+1)
-				}
+				arrCover[y][x] += 1
 			}
 		}
 	}
@@ -97,30 +89,21 @@ func main() {
 
 	// now count how much area is in the overlap array
 	count := 0
-	for y,a := range arrCover {
-		str := ""
-		for x,v := range a {
-			if v == 0{
-				str = str + "."
-			} else if arrOver[y][x] != 0 {
-				str = str + "X"
-				count++
-			}else {
-				// str = str + strconv.Itoa(int(v))
-				str = str + "1"
-			}
-		}
-		// fmt.Println(str)
-	}
-	fmt.Printf("\nCount: %v\n", count)
+	// for _,a := range arrCover {
+	// 	str := ""
+	// 	for _,v := range a {
+	// 		str = str + strconv.Itoa(int(v))
+	// 	}
+	// 	fmt.Println(str)
+	// }
 
-	count = 0
-	for _,a := range arrOver {
+	for _,a := range arrCover {
 		for _,v := range a {
-			if v != 0 {
+			if v > 1{
 				count++
 			}
 		}
 	}
+
 	fmt.Printf("Count: %v",count)
 }
